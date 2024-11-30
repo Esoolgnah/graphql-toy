@@ -12,6 +12,7 @@ const originalMsgs = Array(50)
     timestamp: 1234567890123 + (50 - i) * 1000 * 60,
     text: `${50 - i} mock test`,
   }));
+console.log(JSON.stringify(originalMsgs));
 
 const MsgList = () => {
   const [msgs, setMsgs] = useState([]);
