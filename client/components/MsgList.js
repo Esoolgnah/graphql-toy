@@ -5,9 +5,9 @@ import fetcher from '../fetcher';
 import { useRouter } from 'next/router';
 
 const MsgList = () => {
-  const {
-    query: { userId = '' },
-  } = useRouter();
+  const { query } = useRouter();
+  const userId = query.userId || query.userid || '';
+
   const [msgs, setMsgs] = useState([]);
   const [editingId, setEditingId] = useState(null);
 
@@ -62,7 +62,7 @@ const MsgList = () => {
 
   return (
     <>
-      <MsgInput mutate={onCreate} />
+      {userId && <MsgInput mutate={onCreate} />}
       <ul className="messages">
         {msgs.map((x) => (
           <MsgItem
