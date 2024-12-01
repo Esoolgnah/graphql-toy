@@ -1,15 +1,20 @@
-import { useEffect, useState } from 'react';
+'use client';
+import { useEffect, useRef, useState } from 'react';
 import MsgItem from './MsgItem';
 import MsgInput from './MsgInput';
 import fetcher from '../fetcher';
 import { useRouter } from 'next/router';
+import useInfiniteScroll from '../hooks/useInfiniteScroll';
 
 const MsgList = () => {
   const { query } = useRouter();
   const userId = query.userId || query.userid || '';
+  const fetchMoreEl = useRef(null);
+  const intersecting = useInfiniteScroll(fetchMoreEl);
 
   const [msgs, setMsgs] = useState([]);
   const [editingId, setEditingId] = useState(null);
+  const [hasNext, setHasNext] = useState(true);
 
   const onCreate = async (text) => {
     const newMsg = await fetcher('post', '/messages', { text, userId });
@@ -19,7 +24,6 @@ const MsgList = () => {
 
   const onUpdate = async (text, id) => {
     const newMsg = await fetcher('put', `/messages/${id}`, { text, userId });
-    console.log(newMsg);
     if (!newMsg) throw Error('something wrong');
 
     setMsgs((msgs) => {
@@ -27,7 +31,6 @@ const MsgList = () => {
       if (targetIndex < 0) return msgs;
       const newMsgs = [...msgs];
       newMsgs.splice(targetIndex, 1, newMsg);
-      console.log(newMsgs);
       return newMsgs;
     });
     doneEdit();
@@ -52,13 +55,19 @@ const MsgList = () => {
   const doneEdit = () => setEditingId(null);
 
   const getMessages = async () => {
-    const msgs = await fetcher('get', '/messages');
-    setMsgs(msgs);
+    const mewMsgs = await fetcher('get', '/messages', {
+      params: { cursor: msgs[msgs.length - 1]?.id || '' },
+    });
+    if (mewMsgs?.length === 0) {
+      setHasNext(false);
+      return;
+    }
+    setMsgs((msgs) => [...msgs, ...mewMsgs]);
   };
 
   useEffect(() => {
-    getMessages();
-  }, []);
+    if (intersecting && hasNext) getMessages();
+  }, [intersecting]);
 
   return (
     <>
@@ -76,6 +85,7 @@ const MsgList = () => {
           />
         ))}
       </ul>
+      <div ref={fetchMoreEl} />
     </>
   );
 };
