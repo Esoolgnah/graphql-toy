@@ -1,6 +1,6 @@
 import { readDB } from '../dbController.js';
 
-const getUsers = readDB('users');
+const getUsers = () => readDB('users');
 
 const usersRoute = [
   {
@@ -10,6 +10,8 @@ const usersRoute = [
       const users = getUsers();
       res.send(users);
     },
+  },
+  {
     method: 'get',
     route: '/users/:id',
     handler: ({ params: { id } }, res) => {
