@@ -1,13 +1,13 @@
 import { gql } from 'apollo-server-express';
 
-const userShcema = gql`
+const userSchema = gql`
   type User {
     id: ID!
     nickname: String!
   }
 
   extend type Query {
-    users(): [User!]!
+    users: [User!]!
     user(id: ID!): User
   }
 `;

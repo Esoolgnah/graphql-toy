@@ -1,22 +1,23 @@
 import { gql } from 'apollo-server-express';
 
-const messageShema = gql`
+const messageSchema = gql`
   type Message {
     id: ID!
     text: String!
     user: User!
-    timestamp: Float #13자리 숫자
+    timestamp: Float # 13자리 숫자 (Unix timestamp)
   }
+
   extend type Query {
-    messages(cursor: ID): [Message!]! #getMessages
-    message(id: ID): Message! #getMessage
+    messages: [Message!]! # getMessages
+    message(id: ID): Message! # getMessage
   }
 
   extend type Mutation {
     createMessage(text: String!, userId: ID!): Message!
     updateMessage(id: ID!, text: String!, userId: ID!): Message!
-    deleteMessage(id ID!, userId: ID!): ID!
+    deleteMessage(id: ID!, userId: ID!): ID! # ":" 추가
   }
 `;
 
-export default messageShema;
+export default messageSchema;
